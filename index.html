@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f3f1ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e1210" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Monitoramento e controle de irrigação com ESP32">
+<title>Irrigação</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="app" id="loginView" hidden>
+  <header class="top"><div><p class="eyebrow">Estação esp32_01</p><h1>Entrar</h1></div></header>
+  <form class="panel login" id="loginForm" novalidate>
+    <label for="email">E-mail</label>
+    <input id="email" type="email" autocomplete="username" inputmode="email" required>
+    <label for="senha">Senha</label>
+    <input id="senha" type="password" autocomplete="current-password" minlength="6" required>
+    <button class="cta" type="submit" id="entrar">Entrar</button>
+    <p class="toast" id="loginMsg" role="alert"></p>
+  </form>
+</main>
+
+<main class="app" id="appView" hidden>
+  <header class="top">
+    <div><p class="eyebrow">Estação esp32_01</p><h1>Irrigação</h1></div>
+    <div class="actions"><span class="status" id="status" role="status"><i></i><b>Conectando</b></span><button class="link" id="sair" type="button">Sair</button></div>
+  </header>
+
+  <div class="tab" data-tab="painel">
+    <section class="panel read" id="read" aria-label="Umidade do solo">
+      <p class="label"><span>Umidade do solo</span><span id="idade"></span></p>
+      <div class="big"><strong id="solo">--</strong><span>%</span></div>
+      <div class="scale"><div class="fill" id="fill"></div><i class="mark" id="mark"></i></div>
+      <div class="ticks"><span>0</span><span>25</span><span>50</span><span>75</span><span>100</span></div>
+      <p class="state" id="estado">Aguardando dados</p>
+      <p class="sub" id="previsao"></p>
+    </section>
+    <dl class="metrics">
+      <div><dt>Temperatura</dt><dd id="temp">--</dd></div>
+      <div><dt>Bomba</dt><dd id="bomba">--</dd></div>
+      <div><dt>Última rega</dt><dd id="ultima">--</dd></div>
+      <div><dt>Regas hoje</dt><dd id="hoje">0</dd></div>
+    </dl>
+    <section class="panel">
+      <div class="row"><div class="seg" id="serie"><button type="button" data-s="u" class="on">Umidade</button><button type="button" data-s="t">Temperatura</button></div>
+        <div class="seg" id="janela"><button type="button" data-h="1">1 h</button><button type="button" data-h="3" class="on">3 h</button><button type="button" data-h="6">6 h</button></div></div>
+      <div class="chartbox"><svg id="chart" viewBox="0 0 320 120" preserveAspectRatio="none" role="img" aria-label="Gráfico do histórico"></svg><p class="sub chartmsg" id="chartMsg">Coletando dados, um ponto a cada 2 minutos.</p></div>
+      <p class="sub" id="faixa"></p>
+    </section>
+    <div class="dock">
+      <button class="cta" id="regar" type="button">Regar agora</button>
+      <button class="stop" id="parar" type="button" hidden>Parar rega</button>
+      <button class="more" id="mais" type="button" hidden>+10 s</button>
+    </div>
+  </div>
+
+  <div class="tab" data-tab="ajustes" hidden>
+    <section class="panel">
+      <h2>Rega manual</h2><p class="sub">Use o botão da tela Painel para regar agora</p>
+      <div class="chips" id="rapidos"></div>
+      <div class="field"><label for="manual_duracao_s">Duração <b id="manual_duracao_s_v"></b></label><input type="range" id="manual_duracao_s" min="1" max="120" value="10"></div>
+      <div class="field"><label for="vazao">Vazão da bomba, em ml por segundo</label><input type="number" id="vazao" min="0" max="100" step="0.1" inputmode="decimal" placeholder="0 = não calcular consumo"></div>
+    </section>
+    <section class="panel">
+      <div class="row"><div><h2>Rega automática</h2><p class="sub" id="autoEstado">--</p></div>
+        <label class="switch"><input type="checkbox" id="auto" aria-label="Rega automática"><span></span></label></div>
+      <p class="label lab">Perfil da planta</p><div class="chips" id="chips"></div>
+      <div id="ajustes"></div>
+      <div class="row sched"><h2>Janela de horário</h2><div class="times"><input type="time" id="ini" aria-label="Início"><span class="sub">às</span><input type="time" id="fim" aria-label="Fim"></div></div>
+      <p class="regra" id="regra"></p>
+      <p class="label lab">Condições agora</p><ul class="checks" id="checks"></ul>
+    </section>
+    <button class="ghost" id="notif" type="button">Ativar notificações</button>
+  </div>
+
+  <div class="tab" data-tab="registro" hidden>
+    <section class="panel"><div class="row"><h2>Registro de regas</h2><span class="sub" id="resumo"></span></div><ul class="log" id="log"></ul></section>
+  </div>
+
+  <p class="toast" id="toast" role="status" aria-live="polite"></p>
+  <nav class="tabs" id="tabs" aria-label="Seções"><button type="button" data-t="painel" class="on">Painel</button><button type="button" data-t="ajustes">Ajustes</button><button type="button" data-t="registro">Registro</button></nav>
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>
